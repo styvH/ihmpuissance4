@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Puissance 4</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+      .board {
+        display: flex;
+        flex-wrap: wrap;
+        width: calc(50% - 12px);
+        height: calc(60vh - 12px);
+        margin: 0 auto;
+        background-color: #007bff;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+      }
+      .cell {
+  width: calc(100% / 7 - 10px);
+  height: calc(100% / 6 - 10px);
+  margin: 5px;
+  background-color: #ffffffda;
+  border-radius: 50%;
+  position: relative;
+  animation: circle-animation 1s ease-in-out forwards;
+}
+
+
+.red:before, .yellow:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  z-index: -1;
+  animation: fall 1s ease-in-out forwards;
+}
+
+.red:before {
+  background-color: red;
+}
+
+.yellow:before {
+  background-color: yellow;  
+
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: translateY(5%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+
+
+
+
+@keyframes circle-animation {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+      .player {
+        width: 420px;
+        height: 60px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        line-height: 60px;
+      }
+      .score {
+        width: 420px;
+        margin: 0 auto;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .button {
+        margin: 20px;
+      }
+      body {
+        background-image: url('img/feu_fume.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        
+      }
+      header {
+         height: 150px;
+         padding: 40px;
+         margin: 0 auto;
+         border-bottom: 1px solid black;
+      }
+      h1 {
+         color: white;
+         text-align: center;
+         font-size: 48px;
+      }
+      .selector {
+        display: flex;
+        flex-wrap: wrap;
+        width: calc(50% - 12px);
+        height: calc(10vh);
+        margin: 0 auto;
+        position: relative;
+      }
+      .select {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: calc(100% / 7);
+  height: 40px;
+        color: grey;
+      }
+      .select:hover svg path {
+    fill: #eeeeee;
+}
+    </style>
+  </head>
+  <body>
+
+
+
+    <div class="container">      
+        
+        <div class="player">Tour du joueur : Rouge</div>
+
+        <div class = "selector"></div>
+      <div class="board"></div>
+
+      <script>
+        const board = document.querySelector('.board');
+        const selector = document.querySelector('.selector');
+        var laColonne = 0;
+        for (let i = 0; i < 7*6; i++) {
+            
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.setAttribute('id', laColonne);
+            board.appendChild(cell);
+            if(laColonne == 7){
+                laColonne = 0;
+            }
+            else{
+                laColonne+=1;
+            }
+            
+        }
+        laColonne = 0;
+        for (let i = 0; i < 7; i++) {
+            
+            const select = document.createElement('div');
+            select.classList.add('select');
+            select.setAttribute('id', laColonne);
+            select.innerHTML= `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>`;
+            selector.appendChild(select);
+
+            laColonne+=1;
+            
+        }
+      </script>
+      
+
+      <div class="score">Score : Rouge (0) - Jaune (0)</div>
+      <button class="btn btn-primary btn-lg btn-block button">Nouvelle partie</button>
+      <a class="btn btn-light btn-lg btn-block button" href="menu.html">Retour Menu</a>
+    </div>
+    <script>
+      const cells = document.querySelectorAll('.cell');
+      const playerDiv = document.querySelector('.player');
+      const scoreDiv = document.querySelector('.score');
+      const newGameBtn = document.querySelector('.button');
+
+      let currentPlayer = "red";
+      let redScore = 0;
+      let yellowScore = 0;
+
+      const selects = document.querySelectorAll('.select');
+
+        selects.forEach(select => {
+            select.addEventListener('click', () => {
+                const columnId = parseInt(select.getAttribute('id')); // récupérer l'id de la colonne de la cellule cliquée
+                let targetCell = null;
+                for (let i = 5; i >= 0; i--) { // parcourir les cellules de la colonne en partant du bas
+                    const index = i * 7 + columnId;
+                    const currentCell = cells[index];
+                    if (!currentCell.classList.contains('red') && !currentCell.classList.contains('yellow')) {
+                        targetCell = currentCell;
+                        break; // sortir de la boucle dès qu'on trouve une cellule vide
+                    }
+                }
+                if (targetCell) { 
+                    // si on a trouvé une cellule vide dans la colonne, on la remplit avec la couleur du joueur actuel
+                    targetCell.classList.add(currentPlayer, 'fall');
+                    switchPlayers();
+                    setTimeout(() => {
+                        targetCell.classList.remove('fall');
+                    }, 1000);
+                }
+
+            });
+        });
+
+        cells.forEach(cell => {
+            cell.addEventListener('transitionend', () => {
+                cell.classList.remove('fall');
+            });
+        });
+
+
+      newGameBtn.addEventListener('click', () => {
+        resetGame();
+      });
+
+      function switchPlayers() {
+        if (currentPlayer === "red") {
+          currentPlayer = "yellow";
+          playerDiv.textContent = "Tour du joueur : Jaune";
+        } else {
+          currentPlayer = "red";
+          playerDiv.textContent = "Tour du joueur : Rouge";
+        }
+      }
+
+      function resetGame() {
+        cells.forEach(cell => {
+          cell.classList.remove('red');
+          cell.classList.remove('yellow');
+        });
+        currentPlayer = "red";
+        redScore = 0;
+        yellowScore = 0;
+        playerDiv.textContent = "Tour du joueur : Rouge";
+        scoreDiv.textContent = "Score : Rouge (0) - Jaune (0)";
+      }
+    </script>
+  </body>
+</html>
+

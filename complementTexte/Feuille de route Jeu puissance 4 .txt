@@ -1,0 +1,59 @@
+Feuille de route Jeu puissance 4 :
+ 
+
+1. Autoformation Récupération données Json
+2. Autoformation Bootstrap
+
+3. Création du jeu puissance 4 v1 sans API (Bootstrap + JS) (plus grande valeur ajouté : Priorité 1)
+
+4. Modification du jeu puissance 4 lien jeu
+
+5. Wireframe et Conception graphique des pages
+(Accueil / Présentation, Connexion (Nouveau Pseudo ou Selection Pseudo existant), Menu, Jeu, Global(Header + Navbar))
+
+6. Conception de l'Arborescence et liens entre les pages
+
+7. Créer page inscription: 
+7.a Récupérer les infos de l'API
+7.b stocker les identifiants associés aux pseudos en BD SQL ou en stockage disk
+
+8. Créer page Connexion
+
+9. Implémentation puissance 4
+
+10. Gestion d'erreurs et améliorations
+
+Temps de réalisation Total : 10 H
+
+Réalisation : 
+
+1. Puissance 4 version 1 interface terminé (jeu classique sans lien avec l'API et sans gestion de victoires)
+2. Inscription, Récupération des données Json réussi
+3. Test sauvegarde des données dans un fichier Excel xlsx, test avec Json, obligation de serve mais objectif personnel de faire une mini-app sans serve... 
+(Choix final : Stockage des derniers identifiants utilisés en LocalStorage du navigateur)
+4. Page d'inscription avec sauvegarde des identifiants dans le navigateur (gestion bloquer les duplications)
+
+5. Page de connexion en cliquant sur un des pseudos créés à l'identifiant sauvegardé
+
+6. menu (Inscription - Participer (choix Pseudo) - Puissance 4)
+7. Démarrer une partie // Récupération des Modifications de la carte (requêtes du statut périodique toutes les 2 secondes)
+8. Envoyer les coups
+8.a (ajout https://trankillprojets.fr/P4/?jouer&position=colonne&identifiant=id dans la fonction)
+8.b Verrouiller la Modification du board si joueur != "tour", rendre les boutons non cliquables ou retirer les actions par une condition
+
+9. Réceptionner les coups adverses :
+9.a Récupération et Traitement de la carte, 
+9.b Déclenchement lorsque joueur passe à "tour" 
+9.c Récupérer la Colonne modifiée dans la carte
+9.d Simuler le click de la couleur adverse en javascript
+
+
+10. Finalisation (simulation click adverse récupéré)
+
+11. Peaufinage code (animations et commentaires)
+
+12. Gestion des erreurs
+13. Bonus (sauvegarder les pseudos et identifiants dans un excel)
+
+
+14. Bonus Contact = Send Mail to hauterville.sio@gmail.com : with message content

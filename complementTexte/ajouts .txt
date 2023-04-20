@@ -1,0 +1,6 @@
+ajouts : 
+Gestion Victoire
+Gestion Couleur
+Animation
+
+Stockage Identifiant à la connexion

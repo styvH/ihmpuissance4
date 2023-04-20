@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Puissance 4</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  
+    <style>
+      .board {
+        display: flex;
+        flex-wrap: wrap;
+        width: calc(50% - 12px);
+        height: calc(60vh - 12px);
+        margin: 0 auto;
+        background-color: #007bff;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+      }
+      .cell {
+  width: calc(100% / 7 - 10px);
+  height: calc(100% / 6 - 10px);
+  margin: 5px;
+  background-color: #ffffffda;
+  border-radius: 50%;
+  position: relative;
+  animation: circle-animation 1s ease-in-out forwards;
+}
+
+
+.red:before, .yellow:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  z-index: -1;
+  animation: fall 1s ease-in-out forwards;
+}
+
+.red:before {
+  background-color: red;
+}
+
+.yellow:before {
+  background-color: yellow;  
+
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: translateY(5%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+
+
+
+
+@keyframes circle-animation {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+      .tour {
+        width: 420px;
+        height: 60px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        line-height: 60px;
+      }
+      .versus {
+        width: 420px;
+        margin: 0 auto;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .player {
+        width: 420px;
+        margin: 0 auto;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .button {
+        margin: 20px;
+      }
+      body {
+        background-color: rgb(175, 175, 175);
+      }
+      header {
+         height: 150px;
+         padding: 40px;
+         margin: 0 auto;
+         border-bottom: 1px solid black;
+      }
+      h1 {
+         color: white;
+         text-align: center;
+         font-size: 48px;
+      }
+      .selector {
+        display: flex;
+        flex-wrap: wrap;
+        width: calc(50% - 12px);
+        height: calc(10vh);
+        margin: 0 auto;
+        position: relative;
+      }
+      .select {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: calc(100% / 7);
+  height: 40px;
+        color: grey;
+      }
+      .select:hover svg path {
+    fill: #eeeeee;
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 999;
+}
+
+.popup-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.popup h2 {
+  margin-top: 0;
+}
+
+.popup p {
+  margin-bottom: 0;
+}
+
+#loading-svg {
+  width: 48px;
+  height: 48px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .board {
+    width: calc(90% - 12px);
+    height: calc(50vh - 12px);
+  }
+  .selector{
+    width: calc(90% - 12px);
+  }
+}
+
+    </style>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+          <div>
+              <h4>Puissance 4</h4>
+          </div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ml-auto">
+                  <li class="nav-item ">
+                      <a class="nav-link" href="menu.html">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="32" height="32">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                            </svg>
+                            <span>Accueil</span>
+                          </a>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="playDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="32" height="32">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                            </svg>
+                            
+                            <span>Jouer</span>
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="playDropdown">
+                          <a class="dropdown-item" href="puissance4.html">Mode hors ligne</a>
+                          <a class="dropdown-item" href="participer.html">Mode en ligne</a>
+                        </div>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="recDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="32" height="32">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                          </svg>
+                          <span>Enregistrements</span>
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="recDropdown">
+                          <a class="dropdown-item" href="inscription.html">Enregistrer un pseudo</a>
+                          <a class="dropdown-item" href="addAccount.html">Récupérer un pseudo</a>
+                          <a class="dropdown-item" href="comptes.html">Gérer les comptes enregistrés</a>
+                      </div>
+                  </li>
+                  <li class="nav-item ">
+                      <a class="nav-link" href="contact.html">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="32" height="32">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                            </svg>
+                            
+                            <span>Contact</span>
+                      </a>
+                  </li>
+              
+  
+              </ul>
+                
+              <ul class="navbar-nav ml-auto">          
+                  <li class="nav-item">
+                      <a id="settingsDropdown" class="btn nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"  width="32" height="32">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span>Paramètres</span>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="settingsDropdown">
+                          <a class="dropdown-item" href="inscription.html">Créer un compte</a>
+                          <a class="dropdown-item" href="addAccount.html">Récupérer un compte existant</a>
+                      </div>             
+                  </li>
+              </ul>
+      </div> 
+  </nav>
+
+    <div class="container">      
+        
+        <div class="tour">Tour du joueur : Rouge</div> <div></div>
+
+
+        <div class = "selector"></div>
+      <div class="board"></div>
+
+      <script>
+        const board = document.querySelector('.board');
+        const selector = document.querySelector('.selector');
+        var laColonne = 0;
+        for (let i = 0; i < 7*6; i++) {
+            
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.setAttribute('id', laColonne);
+            board.appendChild(cell);
+            if(laColonne == 7){
+                laColonne = 0;
+            }
+            else{
+                laColonne+=1;
+            }
+            
+        }
+        laColonne = 0;
+        for (let i = 0; i < 7; i++) {
+            
+            const select = document.createElement('div');
+            select.classList.add('select');
+            select.setAttribute('id', laColonne);
+            select.innerHTML= `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>`;
+            selector.appendChild(select);
+
+            laColonne+=1;
+            
+        }
+      </script>
+      
+
+      <div class="versus" style = "color: white"></div>
+      <div class="player" style = "color: white"></div>
+      <div class="d-flex justify-content-center">
+        <div id="button-container" class="text-center ml-auto mr-auto">
+          <button class="btn btn-success btn-lg btn-lg my-2 button" id="start">Démarrer</button> <br>
+          <button class="btn btn-primary btn-lg btn-sm my-2 button" id="new_game" hidden>Nouvelle partie</button>
+          <button class="btn btn-danger btn-lg btn-sm my-2 button" id="abandon" hidden>Abandonner la partie</button><br>
+          <a class="btn btn-light btn-lg btn-sm my-2 button" href="menu.html">Retour Menu</a>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Fenêtre pop up -->
+    <div id="popup" class="popup">
+      <div class="popup-content">
+        <h2>En attente</h2>
+        <svg id="loading-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+        </svg>
+        <p>Il n'y a pas encore d'adversaire</p>
+        
+        
+        <button id="stopRecherche" class="btn btn-light border my-5 mb-4">Annuler la recherche</button>
+
+        <a href = "menu.html" class="btn btn-light border my-5 mb-4">Retour Menu</a>
+      </div>
+    </div>
+
+
+    <script>
+
+      var is_online = false;
+      var jouable = true;
+      var is_from_recup = false; 
+
+      const cells = document.querySelectorAll('.cell');
+      const tourDiv = document.querySelector('.tour');
+      const versusDiv = document.querySelector(".versus");
+      const playerDiv = document.querySelector('.player');
+      const startBtn = document.querySelector('#start');
+      const newGameBtn = document.querySelector('#new_game');
+      const surrenderBtn = document.querySelector('#abandon');
+      const stopRechercheBtn = document.querySelector('#stopRecherche');
+
+      let currentPlayer = "red";
+      let redScore = 0;
+      let yellowScore = 0;
+
+      var lastTour = 0;
+
+
+
+
+      const selects = document.querySelectorAll('.select');
+
+      selects.forEach(select => {
+            select.addEventListener('click', () => {
+
+              
+                const columnId = parseInt(select.getAttribute('id')); // récupérer l'id de la colonne de la cellule cliquée
+                let targetCell = null;
+                for (let i = 5; i >= 0; i--) { // parcourir les cellules de la colonne en partant du bas
+                    const index = i * 7 + columnId;
+                    const currentCell = cells[index];
+                    if (!currentCell.classList.contains('red') && !currentCell.classList.contains('yellow')) {
+                        targetCell = currentCell;
+                        break; // sortir de la boucle dès qu'on trouve une cellule vide
+                    }
+                }
+                if (targetCell) { 
+                    // si on a trouvé une cellule vide dans la colonne, on la remplit avec la couleur du joueur actuel
+                    
+                    
+                    if(is_online){ // Si le jeu est en cours
+                      
+                      console.log("is online : ",is_online);
+
+
+
+                      if(is_from_recup){
+                        console.log("from recup : ",is_from_recup);
+                        targetCell.classList.add(currentPlayer, 'fall');
+                      }else{
+                        console.log("not from recup : ",is_from_recup);
+                        var colonneJouer = columnId+1;  
+                        console.log("Colonne Jouée : ", colonneJouer);                                
+                        sendCoup(colonneJouer); 
+                      }
+                    }
+                    
+                    else{ // Si le jeu n'est pas en cours: Simple dépot de pièces
+                      switchPlayers();
+                      targetCell.classList.add(currentPlayer, 'fall');
+                    }
+
+                }
+              
+
+            });
+        }); 
+
+
+/* 
+        selects.forEach(select => {
+            select.addEventListener('click', () => {
+
+              
+                const columnId = parseInt(select.getAttribute('id')); // récupérer l'id de la colonne de la cellule cliquée
+                let targetCell = null;
+                for (let i = 5; i >= 0; i--) { // parcourir les cellules de la colonne en partant du bas
+                    const index = i * 7 + columnId;
+                    const currentCell = cells[index];
+                    if (!currentCell.classList.contains('red') && !currentCell.classList.contains('yellow')) {
+                        targetCell = currentCell;
+                        break; // sortir de la boucle dès qu'on trouve une cellule vide
+                    }
+                }
+                if (targetCell) { 
+                    // si on a trouvé une cellule vide dans la colonne, on la remplit avec la couleur du joueur actuel
+                    
+                    
+                    if(is_online){
+                      var colonneJouer = columnId+1;
+                      console.log(jouable);
+                       if(jouable){
+                        sendCoup(colonneJouer);
+                       }
+
+                       if(is_from_recup){
+                        targetCell.classList.add(currentPlayer, 'fall');
+                       }
+                      
+
+                    }else{
+                      switchPlayers();
+                      targetCell.classList.add(currentPlayer, 'fall');
+                    }
+
+                      
+                    
+                    setTimeout(() => {
+                        targetCell.classList.remove('fall');
+                    }, 1000);
+                }
+              
+
+            });
+        }); 
+*/
+
+
+
+
+        cells.forEach(cell => {
+            cell.addEventListener('transitionend', () => {
+                cell.classList.remove('fall');
+            });
+        });
+
+
+
+
+      function switchPlayers() {
+        if(!is_online){
+          if (currentPlayer == "red") {
+            currentPlayer = "yellow";
+            tourDiv.textContent = "Tour du joueur : Jaune";
+          } else {
+            currentPlayer = "red";
+            tourDiv.textContent = "Tour du joueur : Rouge";
+          } 
+        }
+           
+        
+        
+        
+
+      }
+
+      /** @todo 
+       * 
+       * Fonction recupération de la partie en cours à insérer dans start Game si une partie est déjà en cours
+       * avec récupération de la carte et reproduction des cellules dans le board
+       * 
+      */
+
+
+      // Récupération de l'identifiant en parametre get
+      const params = new URLSearchParams(window.location.search);
+      const identifiant = params.get('id');
+
+
+
+
+
+var lastCarte = [
+[0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 1, 0, 0, 0],
+[0, 0, 0, 2, 0, 0, 0],
+[0, 0, 0, 1, 0, 0, 0]
+];
+
+recupererCarte(lastCarte);
+
+console.log(lastCarte);
+
+
+      // Liste des url : 
+      const urlStatut = `https://trankillprojets.fr/P4/?statut&identifiant=${identifiant}`;
+      const urlParticiper = `https://trankillprojets.fr/P4/?participer&identifiant=${identifiant}`;
+      const urlAbandon = `https://trankillprojets.fr/P4/?abandonner&identifiant=${identifiant}`;
+
+      var joueurName = "";
+      var adversaireName = "";
+
+      // var urlJouer = `https://trankillprojets.fr/P4/?jouer&position=${colonneJouer}&identifiant=${identifiant}`;
+
+      
+      // Fonction demarrer appel statut défini pour toutes les secondes
+      let appelStatut;
+      function startAppelStatut(){
+        is_online = true;
+        appelStatut= setInterval(() => {
+          fetch(urlStatut)
+            .then(response => response.json())
+            .then(data => {
+              console.log(data.etat); // Ecriture de l'état dans console.log pour un suivi des etats
+
+              // Switch des actions possibles selon les différents états
+              switch (data.etat) {
+              case "KO":
+                // faire quelque chose si le compte n'est pas reconnu
+                console.log("Compte non reconnu");
+                break;
+              case "OK":
+                // retourne Ok après avoir démarré la participation
+                console.log("Erreur de démarrage");
+                stopAppelStatut();
+                /** @todo 
+                 * Relancer une participation
+                 * enregistrer le nombre de relance
+                 * abandon erreur serveur API.
+                */
+
+                break;
+              case "En attente":
+                /** @todo 
+                 * Afficher une page pop up tant que l'état est en attente
+                */
+                popup.style.display = "block";
+                break;
+
+              case "Attente supprimee":
+                /** Temps d'attente > 2 minutes
+                 * Retirer page attente
+                 * Envoyer un feedback Aucun adversaire trouvé.
+                */
+               
+                popup.style.display = "none";
+                alert(`Aucun adversaire trouvé : ${data.etat}`);
+                break;
+
+              case "En cours":                
+                popup.style.display = "none";
+                setInfosJeu(); //MAJ infos Jeu
+                // faire quelque chose si une partie est en cours
+                /** @todo 
+                 * Retirer le pop up si il est présent
+                 * Verifier le tour en cours
+                 * 
+                 *  !!!!! Enregistrer tour du dernier appel !!!!!
+                 * 
+                 * Si tour adverse 
+                 * var urlJouer = `https://trankillprojets.fr/P4/?jouer&position=${colonneJouer}&identifiant=${identifiant}`;
+                */
+               
+                  console.log(data.carte); // Récupérer la carte
+                  recupererCarte(data.carte);
+
+                if (data.tour == data.joueur){ // Mise à jour du tour
+                  jouable = true;
+                }else{
+                  jouable = false;
+                }
+                break;
+
+                // Gestion de victoire : 
+                // Vérifier les victoires => Si l'état de gain arrive en statut, le joueur adverse est vainqueur
+                case "joueur 1 gagne":
+                  alert("Dommage, Perdu la partie...");
+                  break;
+                case "joueur 2 gagne":
+                  alert("Dommage, Perdu la partie...");
+                  break;
+                case "Match nul":
+                  alert("Vous vous êtes bien défendu : Match Nul");
+                  break;
+
+              default:
+                // faire quelque chose si l'état n'est pas reconnu
+                console.log("Erreur état non reconnu, non géré : " + data.etat);
+                break;
+            }
+
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        }, 1000);
+      }
+      function stopAppelStatut(){
+        clearInterval(appelStatut);
+        is_online = false;
+        jouable = true;
+        console.log("appels STOP");
+      }
+
+
+      // Création des Evenements des boutons
+
+      startBtn.addEventListener('click', () => {
+      startGame();
+      });
+
+      newGameBtn.addEventListener('click', () => {
+        resetGame();
+      });
+
+      surrenderBtn.addEventListener('click', () => {
+        quitGame();
+      });
+
+      stopRechercheBtn.addEventListener('click', () => {
+        /** @todo 
+         * Supprimer le pop up 
+         * Possibilité 1 : Arrêter les appels de statut
+         * Posibilité 2 : Continuer les appels de statut et renvoyer abandon 
+        */
+        popup.style.display = "none";
+        quitGame();
+      });
+      
+      function sendCoup(colonneJouer){
+        /** @todo 
+         * Récupérer le coup réalisé par le joueur après son click et l'envoie au serveur
+        */
+       if(jouable){
+        var urlJouer = `https://trankillprojets.fr/P4/?jouer&position=${colonneJouer}&identifiant=${identifiant}`;
+        fetch(urlJouer)
+        .then(response => response.json())
+        .then(data => {
+          setInfosJeu();
+          console.log("online : "+is_online+" | Carte : "+ data.carte + " Tour :"+ data.tour) ;
+          switch (data.etat){
+            // Vérifier les victoires => Si l'état de gain arrive après avoir joué, le joueur est cours est le vainqueur
+            case "joueur 1 gagne":
+              stopAppelStatut();
+              alert("Félicitations, vous avez remporté la partie !!!");
+              break;
+            case "joueur 2 gagne":
+              stopAppelStatut();
+              alert("Félicitations, vous avez remporté la partie !!!");
+              break;
+            case "Match nul":
+              stopAppelStatut();
+              alert("Vous vous êtes bien défendu : Match Nul");
+              break;
+            default:
+              break;
+          }
+        })
+        .catch(error => {
+          console.error(error);
+        });
+        jouable = false;
+      }
+       }
+
+
+      function startGame() {
+            // Réinitialisation des cellules
+            cells.forEach(cell => {
+              cell.classList.remove('red');
+              cell.classList.remove('yellow');
+            });
+            // Réinitialisation des infos de jeu
+
+            tourDiv.textContent = "Tour du joueur : Rouge";
+
+
+            // Modification des boutons affichés (suppression du bouton start et affichage des boutons nouvelle partie et abandon)
+            startBtn.hidden=true;
+            newGameBtn.hidden=false;
+            surrenderBtn.hidden=false;
+
+            /** @todo
+            *
+            * 1er appel statut : https://trankillprojets.fr/P4/?statut&identifiant=id
+            * Si etat = OK : (Utilisateur reconnu)
+            * Lancer la participation => https://trankillprojets.fr/P4/?participer&identifiant=id
+            * si:
+            * etat = en attente => Ecran figé en attente... (animation d'attente pop up au milieu), appels de status toutes les 3 secondes
+            * etat = en cours => Récupération de sa couleur de jeu et de joueur == Tour
+            *
+            */
+
+
+            // 1er appel de statut 
+            fetch(urlStatut)
+              .then(response => response.json())
+              .then(data => {
+                console.log("Appel start : " + data.etat);
+                switch (data.etat) {
+                  case "KO":
+                    // faire quelque chose si le compte n'est pas reconnu
+                    alert("Compte non reconnu, veuillez le vérifier ou choisissez-en un autre");
+                    break;
+                  case "OK":
+                    // faire quelque chose si le compte est reconnu
+                    console.log("Compte reconnu");
+                    popup.style.display = "block";
+                    startAppelStatut();
+                    // Lancer la participation
+                     fetch(urlParticiper)
+                      .then(response => response.json())
+                      .then(data => {
+                        console.log(data.etat);
+                        /** @todo 
+                         * Récupération de l'état
+                         * Récupération du tour (pour savoir si la partie est déjà avancé et a quel point) Lancer fonction récupération des cellules si tour > 1
+                         * Récupération de pseudo du joueur
+                         * Récupération du pseudo adversaire
+                         * Récupération joueur (1 ou 2)
+                         * Si tour 1, pas de récupération de la carte
+                        */
+                        switch (data.etat) {
+                          case "KO":
+                            // faire quelque chose si le compte n'est pas reconnu
+                            alert("Erreur KO Non reconnu");
+                            break;
+                          case "En cours":
+                            // faire quelque chose si le compte n'est pas reconnu
+                            console.log("partie trouvée");
+                            // Vérifier que le board est vide (partie non commencé)
+                            if(!carteVide(data.carte)){
+                              proposerAbandon();
+                            }else{
+                              /** @todo 
+                               * Récupérer le tableau lancer les appels status
+                              */
+                             recupererCarte(data.carte);
+                             startAppelStatut();
+                            }
+                            
+                            break;
+                          case "En attente":
+                            // faire quelque chose si le compte n'est pas reconnu
+                            
+                            break;
+                            
+                          
+                          default:
+                            alert("Etat non reconnu : "+ data.etat);
+                            break;
+                        }
+                        
+                      })
+                      .catch(error => {
+                        console.error(error);
+                      });
+                    
+                    break;
+                  case "En attente":
+                    // faire quelque chose si une partie est déjà en cours de recherche
+                    console.log("Partie déjà en attente");
+                    popup.style.display = "block";
+                    startAppelStatut();
+                    break;
+                  case "En cours":
+                    // faire quelque chose si une partie est déjà en cours
+                    /** @todo 
+                     * récupération des cases avec le cadre (fonction à définir)
+                    */
+                    if(!carteVide(data.carte)){
+                      proposerAbandon();
+                    }else{
+                        /** @todo 
+                         * Récupérer le tableau lancer les appels status
+                        */
+                        recupererCarte(data.carte);
+                        startAppelStatut();
+                    }
+                   
+
+
+
+                    break;
+                  default:
+                    // faire quelque chose si l'état n'est pas reconnu
+                    break;
+                }
+              })
+              .catch(error => {
+                console.error(error);
+              });
+
+
+
+      }
+
+    
+      function quitGame() {
+        cells.forEach(cell => {
+          cell.classList.remove('red');
+          cell.classList.remove('yellow');
+        });
+        currentPlayer = "red";
+
+        tourDiv.textContent = "Tour du joueur : Rouge";
+        playerDiv.textContent = "Partie abandonnée";
+
+        startBtn.hidden=false;
+        newGameBtn.hidden=true;
+        surrenderBtn.hidden=true;
+
+        // Arrêter les appels de statut 
+        stopAppelStatut();
+        // Abandonner
+        fetch(urlAbandon)
+          .then(response => response.json())
+          .then(data => {
+            alert(data.etat);
+          })
+          .catch(error => {
+            console.error(error);
+          });
+          
+
+      }
+
+      function resetGame() {
+        cells.forEach(cell => {
+          cell.classList.remove('red');
+          cell.classList.remove('yellow');
+        });
+        currentPlayer = "red";
+
+        tourDiv.textContent = "Tour du joueur : Rouge";
+        versusDiv.textContent = "";
+        playerDiv.textContent = "Votre couleur : ";
+      }
+
+      function carteVide(carte) { // Vérifier que la carte est vide
+        for (let row = 0; row < carte.length; row++) {
+          for (let col = 0; col < carte[0].length; col++) {
+            if (carte[row][col] !== 0) {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
+
+      function proposerAbandon(){
+        if(confirm("partie déjà en cours, abandonner la partie pour recommencer ?")){
+                    is_online = false;
+                    jouable = true;
+                      fetch(urlAbandon)
+                        .then(response => response.json())
+                        .then(data => {
+                          alert(data.etat);
+                        })
+                        .catch(error => {
+                          console.error(error);
+                        });
+                  } // Abandon
+      }
+      function recupererCarte(tableau){
+  // Effacer le tableau
+  cells.forEach(cell => {
+    cell.classList.remove('red');
+    cell.classList.remove('yellow');
+  });
+
+  // Parcourir le tableau et ajouter la classe correspondante en fonction de la valeur de la cellule
+  for (let row = 0; row < tableau.length; row++) {
+    for (let col = 0; col < tableau[0].length; col++) {
+      const cellValue = tableau[row][col];
+      if (cellValue === 1) {
+        cells[row * 7 + col].classList.add('red');
+      } else if (cellValue === 2) {
+        cells[row * 7 + col].classList.add('yellow');
+      }
+    }
+  }
+}
+
+
+      function setInfosJeu(){
+
+        fetch(urlStatut)
+          .then(response => response.json())
+          .then(data => {
+            console.log(" Get Infos jeu : " + data.etat);
+            if(data.etat == "En cours"){
+                // Initialisation des infos de jeu
+                if(data.joueur == 1){
+
+                  versusDiv.textContent = `${data.pseudo} VS ${data.adversaire}`;
+                  playerDiv.textContent = "Votre couleur : Rouge"; 
+                }else{
+
+                  versusDiv.textContent = `${data.pseudo} VS ${data.adversaire}`;
+                playerDiv.textContent = "Votre couleur : Jaune"; 
+                }
+                if(data.tour == 1){
+                  tourDiv.textContent = "Tour du joueur : Rouge";
+                }else{
+                  tourDiv.textContent = "Tour du joueur : Jaune";
+                }   
+                lastTour = data.tour;
+            }
+            else{
+              console.log("Erreur set Infos");
+              quitGame();
+            }
+
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      }
+      
+
+
+    </script>
+  </body>
+</html>
+

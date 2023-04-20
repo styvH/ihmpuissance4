@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+  <title>Document</title>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Création de pseudo</h1>
+    <form id="pseudo-form">
+      <div class="form-group">
+        <label for="username-input">Nom d'utilisateur :</label>
+        <input type="text" class="form-control" id="username-input" placeholder="Saisissez votre nom d'utilisateur">
+        <span class="invalid-feedback">Ce pseudo existe déjà. Veuillez en choisir un autre.</span>
+      </div>
+      <button type="submit" class="btn btn-primary">Valider</button>
+    </form>
+    <div id="result"></div>
+  </div>
+
+
+  <script>
+
+  const pseudoForm = document.querySelector('#pseudo-form');
+  const resultDiv = document.querySelector('#result');
+  const usernameInput = document.querySelector('#username-input');
+
+  pseudoForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const username = document.querySelector('#username-input').value;
+    
+    const url = `https://trankillprojets.fr/P4/?inscription&pseudo=${username}`;
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.etat === "OK") {
+          resultDiv.textContent = `Pseudo : ${data.pseudo}, Identifiant : ${data.identifiant}, État : ${data.etat}`;
+          
+          const userData = {
+            pseudo: data.pseudo,
+            identifiant: data.identifiant
+          };
+          
+          // Récupérer les données existantes dans le local storage ou initialiser un tableau vide
+          const storedData = JSON.parse(localStorage.getItem('userData')) || [];
+
+          // Ajouter les nouvelles données au tableau
+          storedData.push(userData);
+
+          // Stocker le tableau mis à jour dans le local storage
+          localStorage.setItem('userData', JSON.stringify(storedData));
+
+          // Effacer l'avertissement d'erreur s'il existait
+          usernameInput.classList.remove('is-invalid');
+
+        } else {
+          // Afficher un avertissement d'erreur sous le champ nom d'utilisateur
+        usernameInput.classList.add('is-invalid');
+        }
+      })
+      .catch(error => console.error(error));
+  });
+
+
+  </script>
+
+  
+</body>
+</html>

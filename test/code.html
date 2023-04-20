@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Puissance 4</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+      .board {
+        display: flex;
+        flex-wrap: wrap;
+        width: calc(70% - 12px);
+        height: calc(90vh - 12px);
+        margin: 0 auto;
+        background-color: #007bff;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+      }
+      .cell {
+        width: calc(100% / 7 - 10px);
+        height: calc(100% / 6 - 10px);
+        margin: 5px;
+        background-color: #ffffffda;
+        border-radius: 50%;
+        position: relative;
+      }
+      .cell::after {
+        content: "";
+        width: calc(100% - 20px);
+        height: calc(100% - 20px);
+        border-radius: 50%;
+        background-color: transparent;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .red::after {
+        background-color: red;
+      }
+      .yellow::after {
+        background-color: yellow;
+      }
+      .player {
+        width: 420px;
+        height: 60px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        line-height: 60px;
+      }
+      .score {
+        width: 420px;
+        margin: 0 auto;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .button {
+        margin: 20px;
+      }
+      body {
+        background-image: url('img/feu_fume.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        
+      }
+      header {
+         height: 150px;
+         padding: 40px;
+         border-bottom: 1px solid black;
+      }
+      h1 {
+         color: white;
+         text-align: center;
+         font-size: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <button class="btn btn-primary" style="float: right;">Connexion</button>
+      <h1>Puissance 4</h1>
+    </header>
+    <div class="container mt-5">
+      <div class="board">
+        <div class="column" id="1"></div>
+        <div class="column" id="2"></div>
+        <div class="column" id="3"></div>
+        <div class="column" id="4"></div>
+        <div class="column" id="5"></div>
+        <div class="column" id="6"></div>
+        <div class="column" id="7"></div>
+      </div>
+      <div class="player">Tour du joueur : Rouge</div>
+      <div class="score">Score : Rouge (0) - Jaune (0)</div>
+      <button class="btn btn-primary button">Nouvelle partie</button>
+    </div>
+    <script>
+      const columns = document.querySelectorAll('.column');
+      const playerDiv = document.querySelector('.player');
+      const scoreDiv = document.querySelector('.score');
+      const newGameBtn = document.querySelector('.button');
+  
+      let currentPlayer = "red";
+      let redScore = 0;
+      let yellowScore = 0;
+  
+      columns.forEach(column => {
+        for (let i = 1; i <= 6; i++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.setAttribute('id', (i - 1) * 7 + parseInt(column.id));
+          column.appendChild(cell);
+        }
+      });
+  
+      const cells = document.querySelectorAll('.cell');
+  
+      cells.forEach(cell => {
+        cell.addEventListener('click', () => {
+          const columnId = parseInt(cell.getAttribute('id')) % 7;
+          const cellsInColumn = document.querySelectorAll(`.column[id='${columnId}'] .cell`);
+          for (let i = cellsInColumn.length - 1; i >= 0; i--) {
+            const cellInColumn = cellsInColumn[i];
+            if (!cellInColumn.classList.contains('red') && !cellInColumn.classList.contains('yellow')) {
+              cellInColumn.classList.add(currentPlayer);
+              switchPlayers();
+              return;
+            }
+          }
+        });
+      });
+  
+      newGameBtn.addEventListener('click', () => {
+        resetGame();
+      });
+  
+      function switchPlayers() {
+        if (currentPlayer === "red") {
+          currentPlayer = "yellow";
+          playerDiv.textContent = "Tour du joueur : Jaune";
+        } else {
+          currentPlayer = "red";
+          playerDiv.textContent = "Tour du joueur : Rouge";
+        }
+      }
+  
+      function resetGame() {
+        cells.forEach(cell => {
+          cell.classList.remove('red');
+          cell.classList.remove('yellow');
+        });
+        currentPlayer = "red";
+        redScore = 0;
+        yellowScore = 0;
+        playerDiv.textContent = "Tour du joueur : Rouge";
+        scoreDiv.textContent = "Score : Rouge (0) - Jaune (0)";
+      }
+    </script>
+  </body>
+  
+  
+  
+</html>
+

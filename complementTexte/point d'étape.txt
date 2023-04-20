@@ -1,0 +1,9 @@
+Le code fonctionne,
+
+Le puissance 4 fonctionne correctement
+
+Points à améliorer : 
+
+Afficher le dernier pion sélectionné avant d'afficher le pop up gagné ou perdu
+
+Permettre de récupérer une partie en cours au lieu de l'abandonner.

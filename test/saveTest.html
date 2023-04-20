@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+const usersData = {
+      pseudo: 'pfr',
+      identifiant: 'fafa'
+
+  };
+
+
+  // Récupérer les données existantes dans le local storage ou initialiser un tableau vide
+  const storedData = JSON.parse(localStorage.getItem('userData')) || [];
+
+  // Ajouter les nouvelles données au tableau
+  storedData.push(usersData);
+
+  // Stocker le tableau mis à jour dans le local storage
+  localStorage.setItem('userData', JSON.stringify(storedData));
+    </script>
+
+      
+</body>
+</html>

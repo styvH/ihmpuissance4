@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page HTML</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <style>
+    .btn-group-center {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    const userDataList = JSON.parse(localStorage.getItem('userData')) || [];
+    const buttonGroup = document.createElement('div');
+    buttonGroup.classList.add('btn-group', 'btn-group-center');
+    buttonGroup.setAttribute('role', 'group');
+    buttonGroup.setAttribute('aria-label', 'Pseudos');
+
+    userDataList.forEach(userData => {
+      const button = document.createElement('button');
+      button.classList.add('btn', 'btn-primary');
+      button.textContent = userData.pseudo;
+      button.setAttribute('data-identifiant', userData.identifiant);
+      button.setAttribute('type', 'button');
+      button.addEventListener('click', () => {
+        const identifiant = button.getAttribute('data-identifiant');
+        window.location.href = `https://trankillprojets.fr/P4/?participer&identifiant=${identifiant}`;
+      });
+      buttonGroup.appendChild(button);
+    });
+
+    document.body.appendChild(buttonGroup);
+  </script>
+</body>
+</html>

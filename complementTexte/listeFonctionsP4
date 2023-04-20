@@ -1,0 +1,67 @@
+Puissance 4
+On effectue des requêtes au serveur et les informations retournées sont fournies au format JSON.
+
+id représente la valeur reçue après son inscription sur la plateforme
+
+Inscription :
+https://trankillprojets.fr/P4/?inscription&pseudo=pseudonyme
+{ "pseudo" : "pseudonyme", "identifiant" : "code", "etat" : "OK" }
+{ "pseudo" : "pseudonyme", "etat" : "KO" }
+Participer :
+https://trankillprojets.fr/P4/?participer&identifiant=id
+{ "pseudo" : "pseudonyme", "joueur" : "numero du joueur (1 ou 2)", "tour" : "tour de jeu (1 ou 2)", "etat" : "statut de la partie" }
+Statut :
+https://trankillprojets.fr/P4/?statut&identifiant=id
+Retour 1
+{"pseudo":"pseudonyme","identifiant":"identifiant unique","etat":"OK"}
+Retour 2
+{ "pseudo" : "pseudonyme", "adversaire" : "pseudonyme", "carte" : "[]" , "joueur" : "numero du joueur (1 ou 2)", "tour" : "tour de jeu (1 ou 2)", "etat" : "statut de la partie" }
+Jouer :
+https://trankillprojets.fr/P4/?jouer&position=colonne&identifiant=id
+{ "pseudo" : "pseudonyme", "carte" : "[]" , "joueur" : "numero du joueur (1 ou 2)", "tour" : "tour de jeu (1 ou 2)", "etat" : "statut de la partie" }
+Un joueur a une invitation de jouer si joueur=tour et dans le cas contraire, il reste en attente en interrogeant le service régulièrement.
+etat prend les valeurs suivantes :
+"KO" : votre compte n'est pas reconnu par le serveur
+"OK" : votre compte est reconnu par le serveur
+"En attente" : Il n'y a pas encore d'adversaire
+"En cours" : Une partie est en cours
+"joueur 1 gagne" : Le joueur numéro 1 gagne
+"joueur 2 gagne" : Le joueur numéro 2 gagne
+"Match nul" : Aucun des joueurs ne remporte la partie
+
+Fonctions à définir : 
+
+Objectif := C'est mon tour, je dépose un jeton, c'est le tour adverse, je récupère son jeu avec l'API, c'est mon tour etc.
+
+Départ : 
+1er appel statut : https://trankillprojets.fr/P4/?statut&identifiant=id
+Si etat = OK : (Utilisateur reconnu)
+Lancer la participation => https://trankillprojets.fr/P4/?participer&identifiant=id
+si:
+etat = en attente => Ecran figé, appels de status toutes les 3 secondes
+etat = en cours => Récupération de sa couleur de jeu et de joueur == Tour
+
+
+Jouer à son tour : Modifier le clique select pour utiliser la commande (Récupération de la colonne)
+https://trankillprojets.fr/P4/?jouer&position=colonne&identifiant=id
+Créer ou Modifier une carte
+
+Appel statut : Récupération Etat et Récupération Joueur (Tour)
+https://trankillprojets.fr/P4/?statut&identifiant=id
+
+Code gestion adversaire : 
+Récupération Carte (evenement déclencheur = changement de en attente à Tour) 
+Récupérer ancienne carte si existe, Stocker nouvelle carte 
+Exécuter evenement clique de la couleur adverse en JS dans la colonne envoyé.
+
+Fin : = Gestion Victoire:
+etat en cours => déroulement de partie écoute des coups
+etat joueur 1 gagne => Récupération numéro de joueur, Affichage pop up(alert), vous avez gagné / perdu + fin de partie - retour au menu
+etat joueur 2 gagne => Récupération numéro de joueur, Affichage pop up(alert), vous avez gagné / perdu + fin de partie - retour au menu
+
+Gestion erreur : 
+- Ne pas envoyer de position si la colonne  
+
+
+Solution : 
+Créer un algorithme qui compare l'ancien tableau et le nouveau et qui retourne la colonne ajoutée.
