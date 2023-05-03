@@ -55,9 +55,9 @@
 
 @keyframes fall {
   0% {
-    transform: translateY(-100%);
+    transform: translateY(-700%);
   }
-  50% {
+  75% {
     transform: translateY(5%);
   }
   100% {
@@ -516,7 +516,7 @@
 
 
 
-
+var numJoueur = 0;
 
 var lastCarte = [
 [0, 0, 0, 0, 0, 0, 0],
@@ -552,12 +552,14 @@ console.log(lastCarte);
             .then(response => response.json())
             .then(data => {
               console.log(data.etat); // Ecriture de l'état dans console.log pour un suivi des etats
+              console.log(data.carte);
 
               // Switch des actions possibles selon les différents états
               switch (data.etat) {
               case "KO":
                 // faire quelque chose si le compte n'est pas reconnu
                 console.log("Compte non reconnu");
+                stopAppelStatut();
                 break;
               case "OK":
                 // retourne Ok après avoir démarré la participation
@@ -611,18 +613,6 @@ console.log(lastCarte);
                 }
                 break;
 
-                // Gestion de victoire : 
-                // Vérifier les victoires => Si l'état de gain arrive en statut, le joueur adverse est vainqueur
-                case "joueur 1 gagne":
-                  alert("Dommage, Perdu la partie...");
-                  break;
-                case "joueur 2 gagne":
-                  alert("Dommage, Perdu la partie...");
-                  break;
-                case "Match nul":
-                  alert("Vous vous êtes bien défendu : Match Nul");
-                  break;
-
               default:
                 // faire quelque chose si l'état n'est pas reconnu
                 console.log("Erreur état non reconnu, non géré : " + data.etat);
@@ -635,6 +625,7 @@ console.log(lastCarte);
             });
         }, 1000);
       }
+
       function stopAppelStatut(){
         clearInterval(appelStatut);
         is_online = false;
@@ -681,14 +672,17 @@ console.log(lastCarte);
           switch (data.etat){
             // Vérifier les victoires => Si l'état de gain arrive après avoir joué, le joueur est cours est le vainqueur
             case "joueur 1 gagne":
+              recupererCarte(data.carte);
               stopAppelStatut();
               alert("Félicitations, vous avez remporté la partie !!!");
               break;
             case "joueur 2 gagne":
+              recupererCarte(data.carte);
               stopAppelStatut();
               alert("Félicitations, vous avez remporté la partie !!!");
               break;
             case "Match nul":
+              recupererCarte(data.carte);
               stopAppelStatut();
               alert("Vous vous êtes bien défendu : Match Nul");
               break;
@@ -763,6 +757,7 @@ console.log(lastCarte);
                         switch (data.etat) {
                           case "KO":
                             // faire quelque chose si le compte n'est pas reconnu
+                            stopAppelStatut();
                             alert("Erreur KO Non reconnu");
                             break;
                           case "En cours":
@@ -844,7 +839,7 @@ console.log(lastCarte);
         currentPlayer = "red";
 
         tourDiv.textContent = "Tour du joueur : Rouge";
-        playerDiv.textContent = "Partie abandonnée";
+        playerDiv.textContent = "Partie terminée";
 
         startBtn.hidden=false;
         newGameBtn.hidden=true;
@@ -889,7 +884,7 @@ console.log(lastCarte);
       }
 
       function proposerAbandon(){
-        if(confirm("partie déjà en cours, abandonner la partie pour recommencer ?")){
+        if(confirm("partie déjà en cours, voulez-vous abandonner et recommencer ? (Tapez Non pour reprendre la partie)")){
                     is_online = false;
                     jouable = true;
                       fetch(urlAbandon)
@@ -901,6 +896,9 @@ console.log(lastCarte);
                           console.error(error);
                         });
                   } // Abandon
+        else{
+          startAppelStatut();
+        }
       }
       function recupererCarte(tableau){
   // Effacer le tableau
@@ -929,14 +927,15 @@ console.log(lastCarte);
           .then(response => response.json())
           .then(data => {
             console.log(" Get Infos jeu : " + data.etat);
-            if(data.etat == "En cours"){
+            switch(data.etat){
+            case "En cours":
                 // Initialisation des infos de jeu
                 if(data.joueur == 1){
-
+                  numJoueur = 1;
                   versusDiv.textContent = `${data.pseudo} VS ${data.adversaire}`;
                   playerDiv.textContent = "Votre couleur : Rouge"; 
                 }else{
-
+                  numJoueur = 2;
                   versusDiv.textContent = `${data.pseudo} VS ${data.adversaire}`;
                 playerDiv.textContent = "Votre couleur : Jaune"; 
                 }
@@ -946,11 +945,36 @@ console.log(lastCarte);
                   tourDiv.textContent = "Tour du joueur : Jaune";
                 }   
                 lastTour = data.tour;
-            }
-            else{
+            
+                        // Gestion de victoire : 
+            // Vérifier les victoires => Si l'état de gain arrive en statut, le joueur adverse est vainqueur
+            case "joueur 1 gagne":
+              stopAppelStatut();
+
+              if(numJoueur == 1){
+                alert("Félicitations, vous avez remporté la partie !!!");
+              }else{
+                alert("Dommage, vous avez perdu...");
+              }
+              
+              break;
+            case "joueur 2 gagne":
+              stopAppelStatut();
+              if(numJoueur == 2){
+                alert("Félicitations, vous avez remporté la partie !!!");
+              }else{
+                alert("Dommage, vous avez perdu...");
+              }
+              break;
+            case "Match nul":
+              stopAppelStatut();
+              alert("Vous vous êtes bien défendu : Match Nul");
+              break;
+            default:
               console.log("Erreur set Infos");
               quitGame();
-            }
+             break;
+          }
 
           })
           .catch(error => {
