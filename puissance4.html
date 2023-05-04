@@ -31,6 +31,20 @@
   animation: circle-animation 1s ease-in-out forwards;
 }
 
+.winning-cell {
+  animation: rotate 3s linear forwards;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
 
 .red:before, .yellow:before {
   content: "";
@@ -97,6 +111,8 @@
     opacity: 1;
   }
 }
+
+
       .tour {
         width: 420px;
         height: 60px;
@@ -264,7 +280,7 @@
                       </div>
                   </li>
                   <li class="nav-item ">
-                      <a class="nav-link" href="contact.html">
+                      <a class="nav-link" href="mailto:styvan.h@gmail.com">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="32" height="32">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                             </svg>
@@ -434,6 +450,7 @@
                         const col = cellIndex % 7;
                         if (verifWin(row, col)) {
                             jouable = false;
+                            targetCell.classList.add('winning-cell');
                             if (currentPlayer == "red") {
                               tourDiv.textContent = "Victoire du joueur : Rouge";
                             } else {
@@ -637,11 +654,13 @@
           switch (data.etat){
             // Vérifier les victoires => Si l'état de gain arrive après avoir joué, le joueur est cours est le vainqueur
             case "joueur 1 gagne":
+              win = true;
               recupererCarte(data.carte);
               stopAppelStatut();
               alert("Félicitations, vous avez remporté la partie !!!");
               break;
             case "joueur 2 gagne":
+              win = true;
               recupererCarte(data.carte);
               stopAppelStatut();
               alert("Félicitations, vous avez remporté la partie !!!");
@@ -687,7 +706,9 @@
             * etat = en cours => Récupération de sa couleur de jeu et de joueur == Tour
             *
             */
+            if(identifiant){
 
+            
           // Lancer la participation
             fetch(urlParticiper)
             .then(response => response.json())
@@ -762,6 +783,11 @@
                 console.error(error);
               });
 
+            }else{
+              online = false;
+              jouable = true;
+              currentPlayer = "red";
+            }
 
 
       }
@@ -836,25 +862,29 @@
           startAppelStatut();
         }
       }
+      var win = false;
       function recupererCarte(tableau){
-  // Effacer le tableau
-  cells.forEach(cell => {
-    cell.classList.remove('red');
-    cell.classList.remove('yellow');
-  });
+        // Effacer le tableau
+        cells.forEach(cell => {
+          cell.classList.remove('red');
+          cell.classList.remove('yellow');
+        });
 
-  // Parcourir le tableau et ajouter la classe correspondante en fonction de la valeur de la cellule
-  for (let row = 0; row < tableau.length; row++) {
-    for (let col = 0; col < tableau[0].length; col++) {
-      const cellValue = tableau[row][col];
-      if (cellValue === 1) {
-        cells[row * 7 + col].classList.add('red');
-      } else if (cellValue === 2) {
-        cells[row * 7 + col].classList.add('yellow');
+        // Parcourir le tableau et ajouter la classe correspondante en fonction de la valeur de la cellule
+        for (let row = 0; row < tableau.length; row++) {
+          for (let col = 0; col < tableau[0].length; col++) {
+            const cellValue = tableau[row][col];
+            if (cellValue === 1) {
+              cells[row * 7 + col].classList.add('red');
+            } else if (cellValue === 2) {
+              cells[row * 7 + col].classList.add('yellow');
+            }
+            if(win){
+              cells[row * 7 + col].classList.add('winning-cell');
+            }
+          }
+        }
       }
-    }
-  }
-}
 
 
       function setInfosJeu(){
