@@ -371,7 +371,12 @@
 
       var is_online = false;
       var jouable = true;
-      var is_from_recup = false; 
+      var is_from_recup = false;
+      let currentPlayer = "red";
+      let redScore = 0;
+      let yellowScore = 0;
+      var numJoueur = 0;
+ 
 
       const cells = document.querySelectorAll('.cell');
       const tourDiv = document.querySelector('.tour');
@@ -381,18 +386,11 @@
       const newGameBtn = document.querySelector('#new_game');
       const surrenderBtn = document.querySelector('#abandon');
       const stopRechercheBtn = document.querySelector('#stopRecherche');
-
-      let currentPlayer = "red";
-      let redScore = 0;
-      let yellowScore = 0;
-
-      var lastTour = 0;
-
-
-
-
       const selects = document.querySelectorAll('.select');
 
+
+
+      
       selects.forEach(select => {
             select.addEventListener('click', () => {
 
@@ -428,67 +426,31 @@
                       }
                     }
                     
-                    else{ // Si le jeu n'est pas en cours: Simple dépot de pièces
-                      switchPlayers();
-                      targetCell.classList.add(currentPlayer, 'fall');
-                    }
-
-                }
-              
-
-            });
-        }); 
-
-
-/* 
-        selects.forEach(select => {
-            select.addEventListener('click', () => {
-
-              
-                const columnId = parseInt(select.getAttribute('id')); // récupérer l'id de la colonne de la cellule cliquée
-                let targetCell = null;
-                for (let i = 5; i >= 0; i--) { // parcourir les cellules de la colonne en partant du bas
-                    const index = i * 7 + columnId;
-                    const currentCell = cells[index];
-                    if (!currentCell.classList.contains('red') && !currentCell.classList.contains('yellow')) {
-                        targetCell = currentCell;
-                        break; // sortir de la boucle dès qu'on trouve une cellule vide
-                    }
-                }
-                if (targetCell) { 
-                    // si on a trouvé une cellule vide dans la colonne, on la remplit avec la couleur du joueur actuel
-                    
-                    
-                    if(is_online){
-                      var colonneJouer = columnId+1;
-                      console.log(jouable);
-                       if(jouable){
-                        sendCoup(colonneJouer);
-                       }
-
-                       if(is_from_recup){
+                    else{ // Si le jeu en ligne n'est pas en cours: Simple dépot de pièces
+                      if(jouable){
                         targetCell.classList.add(currentPlayer, 'fall');
-                       }
-                      
-
-                    }else{
-                      switchPlayers();
-                      targetCell.classList.add(currentPlayer, 'fall');
+                        const cellIndex = Array.from(cells).indexOf(targetCell);
+                        const row = Math.floor(cellIndex / 7);
+                        const col = cellIndex % 7;
+                        if (verifWin(row, col)) {
+                            jouable = false;
+                            if (currentPlayer == "red") {
+                              tourDiv.textContent = "Victoire du joueur : Rouge";
+                            } else {
+                              tourDiv.textContent = "Victoire du joueur : Jaune";
+                            } 
+                        }else{
+                          switchPlayers();
+                        } 
+                      }
+                     
                     }
 
-                      
-                    
-                    setTimeout(() => {
-                        targetCell.classList.remove('fall');
-                    }, 1000);
                 }
               
 
             });
         }); 
-*/
-
-
 
 
         cells.forEach(cell => {
@@ -510,11 +472,6 @@
             tourDiv.textContent = "Tour du joueur : Rouge";
           } 
         }
-           
-        
-        
-        
-
       }
 
       /** @todo 
@@ -531,20 +488,6 @@
 
 
 
-var numJoueur = 0;
-
-var lastCarte = [
-[0, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 1, 0, 0, 0],
-[0, 0, 0, 2, 0, 0, 0],
-[0, 0, 0, 1, 0, 0, 0]
-];
-
-recupererCarte(lastCarte);
-
-console.log(lastCarte);
 
 
       // Liste des url : 
@@ -552,8 +495,10 @@ console.log(lastCarte);
       const urlParticiper = `https://trankillprojets.fr/P4/?participer&identifiant=${identifiant}`;
       const urlAbandon = `https://trankillprojets.fr/P4/?abandonner&identifiant=${identifiant}`;
 
-      var joueurName = "";
-      var adversaireName = "";
+      var pseudo = "";
+      var adversaire = "";
+      var etat = "";
+      var tour = 0;
 
       // var urlJouer = `https://trankillprojets.fr/P4/?jouer&position=${colonneJouer}&identifiant=${identifiant}`;
 
@@ -606,6 +551,12 @@ console.log(lastCarte);
 
               case "En cours":                
                 popup.style.display = "none";
+                pseudo = data.pseudo;
+                adversaire = data.adversaire;
+                etat = data.etat;
+                tour = data.tour;
+                numJoueur = data.joueur;
+
                 setInfosJeu(); //MAJ infos Jeu
                 // faire quelque chose si une partie est en cours
                 /** @todo 
@@ -630,7 +581,7 @@ console.log(lastCarte);
 
               default:
                 // faire quelque chose si l'état n'est pas reconnu
-                console.log("Erreur état non reconnu, non géré : " + data.etat);
+                console.log("Erreur état non reconnu ou non traité : " + data.etat);
                 break;
             }
 
@@ -656,7 +607,7 @@ console.log(lastCarte);
       });
 
       newGameBtn.addEventListener('click', () => {
-        resetGame();
+        startGame();
       });
 
       surrenderBtn.addEventListener('click', () => {
@@ -677,7 +628,6 @@ console.log(lastCarte);
         /** @todo 
          * Récupérer le coup réalisé par le joueur après son click et l'envoie au serveur
         */
-       if(jouable){
         var urlJouer = `https://trankillprojets.fr/P4/?jouer&position=${colonneJouer}&identifiant=${identifiant}`;
         fetch(urlJouer)
         .then(response => response.json())
@@ -708,9 +658,7 @@ console.log(lastCarte);
         .catch(error => {
           console.error(error);
         });
-        jouable = false;
       }
-       }
 
 
       function startGame() {
@@ -740,100 +688,73 @@ console.log(lastCarte);
             *
             */
 
-
-            // 1er appel de statut 
-            fetch(urlStatut)
-              .then(response => response.json())
-              .then(data => {
-                console.log("Appel start : " + data.etat);
+          // Lancer la participation
+            fetch(urlParticiper)
+            .then(response => response.json())
+            .then(data => {
+              console.log("data(Participer)");
+              console.log(data);
+              /** @todo 
+               * Récupération de l'état
+               * Récupération du tour (pour savoir si la partie est déjà avancé et a quel point) Lancer fonction récupération des cellules si tour > 1
+               * Récupération de pseudo du joueur
+               * Récupération du pseudo adversaire
+               * Récupération joueur (1 ou 2)
+               * Si tour 1, pas de récupération de la carte
+              */
                 switch (data.etat) {
                   case "KO":
                     // faire quelque chose si le compte n'est pas reconnu
-                    alert("Compte non reconnu, veuillez le vérifier ou choisissez-en un autre");
-                    break;
-                  case "OK":
-                    // faire quelque chose si le compte est reconnu
-                    console.log("Compte reconnu");
-                    popup.style.display = "block";
-                    startAppelStatut();
-                    // Lancer la participation
-                     fetch(urlParticiper)
-                      .then(response => response.json())
-                      .then(data => {
-                        console.log(data.etat);
-                        /** @todo 
-                         * Récupération de l'état
-                         * Récupération du tour (pour savoir si la partie est déjà avancé et a quel point) Lancer fonction récupération des cellules si tour > 1
-                         * Récupération de pseudo du joueur
-                         * Récupération du pseudo adversaire
-                         * Récupération joueur (1 ou 2)
-                         * Si tour 1, pas de récupération de la carte
-                        */
-                        switch (data.etat) {
-                          case "KO":
-                            // faire quelque chose si le compte n'est pas reconnu
-                            stopAppelStatut();
-                            alert("Erreur KO Non reconnu");
-                            break;
-                          case "En cours":
-                            // faire quelque chose si le compte n'est pas reconnu
-                            console.log("partie trouvée");
-                            // Vérifier que le board est vide (partie non commencé)
-                            if(!carteVide(data.carte)){
-                              proposerAbandon();
-                            }else{
-                              /** @todo 
-                               * Récupérer le tableau lancer les appels status
-                              */
-                             recupererCarte(data.carte);
-                             startAppelStatut();
-                            }
-                            
-                            break;
-                          case "En attente":
-                            // faire quelque chose si le compte n'est pas reconnu
-                            
-                            break;
-                            
-                          
-                          default:
-                            alert("Etat non reconnu : "+ data.etat);
-                            break;
-                        }
-                        
-                      })
-                      .catch(error => {
-                        console.error(error);
-                      });
-                    
-                    break;
-                  case "En attente":
-                    // faire quelque chose si une partie est déjà en cours de recherche
-                    console.log("Partie déjà en attente");
-                    popup.style.display = "block";
-                    startAppelStatut();
+                    if(confirm("Identifiant : compte non reconnu... Voulez vous-jouer hors ligne ?")){
+                        online = false;
+                    }
                     break;
                   case "En cours":
-                    // faire quelque chose si une partie est déjà en cours
-                    /** @todo 
-                     * récupération des cases avec le cadre (fonction à définir)
-                    */
+                    // faire quelque chose si le compte n'est pas reconnu
+                    alert("Une partie a été trouvé !");
+                    // Vérifier que le board est vide (partie non commencé)
                     if(!carteVide(data.carte)){
                       proposerAbandon();
                     }else{
-                        /** @todo 
-                         * Récupérer le tableau lancer les appels status
-                        */
-                        recupererCarte(data.carte);
-                        startAppelStatut();
+                      /** @todo 
+                       * Récupérer le tableau lancer les appels status
+                      */
+                      recupererCarte(data.carte);
+                      startAppelStatut();
                     }
-                   
-
-
-
+                    
                     break;
+                  case "En attente":
+                    // faire quelque chose si le compte n'est pas reconnu
+                    startAppelStatut();
+                    break;
+                    
+                  case "joueur 1 gagne":
+                    stopAppelStatut();
+                    if(numJoueur == 1){
+                      alert("Félicitations, vous avez remporté la partie !!!");
+                    }else{
+                      alert("Dommage, vous avez perdu...");
+                    }
+                    break;
+
+                  case "joueur 2 gagne":
+                    stopAppelStatut();
+                    if(numJoueur == 2){
+                      alert("Félicitations, vous avez remporté la partie !!!");
+                    }else{
+                      alert("Dommage, vous avez perdu...");
+                    }
+                    break;
+
+                  case "Match nul":
+                    stopAppelStatut();
+                    alert("Vous vous êtes bien défendu : Match Nul");
+                    break;
+          
+
                   default:
-                    // faire quelque chose si l'état n'est pas reconnu
+                    alert("Etat non reconnu : "+ data.etat);
                     break;
                 }
               })
@@ -938,31 +859,25 @@ console.log(lastCarte);
 
       function setInfosJeu(){
 
-        fetch(urlStatut)
-          .then(response => response.json())
-          .then(data => {
-            console.log(" Get Infos jeu : " + data.etat);
-            switch(data.etat){
+            console.log(" Get Infos jeu : " + etat);
+            switch(etat){
             case "En cours":
                 // Initialisation des infos de jeu
-                if(data.joueur == 1){
+                if(numJoueur == 1){
                   numJoueur = 1;
-                  versusDiv.textContent = `${data.pseudo} VS ${data.adversaire}`;
+                  versusDiv.textContent = `${pseudo} VS ${adversaire}`;
                   playerDiv.textContent = "Votre couleur : Rouge"; 
                 }else{
                   numJoueur = 2;
-                  versusDiv.textContent = `${data.pseudo} VS ${data.adversaire}`;
+                  versusDiv.textContent = `${pseudo} VS ${adversaire}`;
                 playerDiv.textContent = "Votre couleur : Jaune"; 
                 }
-                if(data.tour == 1){
+                if(tour == 1){
                   tourDiv.textContent = "Tour du joueur : Rouge";
                 }else{
                   tourDiv.textContent = "Tour du joueur : Jaune";
                 }   
-                lastTour = data.tour;
-            
-                        // Gestion de victoire : 
-            // Vérifier les victoires => Si l'état de gain arrive en statut, le joueur adverse est vainqueur
+                break;
             case "joueur 1 gagne":
               stopAppelStatut();
 
@@ -971,8 +886,8 @@ console.log(lastCarte);
               }else{
                 alert("Dommage, vous avez perdu...");
               }
-              
               break;
+
             case "joueur 2 gagne":
               stopAppelStatut();
               if(numJoueur == 2){
@@ -981,23 +896,51 @@ console.log(lastCarte);
                 alert("Dommage, vous avez perdu...");
               }
               break;
+
             case "Match nul":
               stopAppelStatut();
               alert("Vous vous êtes bien défendu : Match Nul");
               break;
+
             default:
               console.log("Erreur set Infos");
               quitGame();
              break;
           }
-
-          })
-          .catch(error => {
-            console.error(error);
-          });
       }
       
 
+      function verifWin(row = 0, col = 0, l = 0, c = 0) {
+    if (c === 0 && l === 0) {
+        // horizontal
+        const va = 1 + verifWin(row, col - 1, 0, -1) + verifWin(row, col + 1, 0, 1);
+
+        // vertical
+        const vb = 1 + verifWin(row - 1, col, -1, 0) + verifWin(row + 1, col, 1, 0);
+
+        // diagonale gauche
+        const vc = 1 + verifWin(row - 1, col - 1, -1, -1) + verifWin(row + 1, col + 1, 1, 1);
+
+        // diagonale droite
+        const vd = 1 + verifWin(row - 1, col + 1, -1, 1) + verifWin(row + 1, col - 1, 1, -1);
+
+        if (va >= 4 || vb >= 4 || vc >= 4 || vd >= 4) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (row >= 0 && row < 6 && col >= 0 && col < 7) {
+        const index = row * 7 + col;
+        const currentCell = cells[index];
+        if (currentCell.classList.contains(currentPlayer)) {
+            return 1 + verifWin(row + l, col + c, l, c);
+        } else {
+            return 0;
+        }
+    } else {
+        return 0;
+    }
+}
 
     </script>
   </body>
