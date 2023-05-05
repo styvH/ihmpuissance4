@@ -832,6 +832,9 @@
               })
               .catch(error => {
                 console.error(error);
+                alert("Erreur, veuillez vérifier votre connexion internet ! Démarrage d'une partie en mode hors ligne");
+                is_online = false;
+                jouable = true;
               });
 
             }else{
