@@ -612,7 +612,7 @@
       function stopAppelStatut(){
         clearInterval(appelStatut);
         is_online = false;
-        jouable = true;
+        jouable = false;
         console.log("appels STOP");
       }
 
@@ -728,6 +728,8 @@
                     // faire quelque chose si le compte n'est pas reconnu
                     if(confirm("Identifiant : compte non reconnu... Voulez vous-jouer hors ligne ?")){
                         online = false;
+                        jouable = true;
+                        currentPlayer = "red";
                     }
                     break;
                   case "En cours":
