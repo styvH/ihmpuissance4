@@ -312,7 +312,7 @@
 
     <div class="container">      
         
-        <div class="tour">Tour du joueur : Rouge</div> <div></div>
+        <div class="tour" style = "background-color: red">Tour du joueur : Rouge</div> <div></div>
 
 
         <div class = "selector"></div>
@@ -484,9 +484,11 @@
           if (currentPlayer == "red") {
             currentPlayer = "yellow";
             tourDiv.textContent = "Tour du joueur : Jaune";
+            tourDiv.style.backgroundColor = "yellow";
           } else {
             currentPlayer = "red";
             tourDiv.textContent = "Tour du joueur : Rouge";
+            tourDiv.style.backgroundColor = "red";
           } 
         }
       }
@@ -595,10 +597,42 @@
                   jouable = false;
                 }
                 break;
+              case "joueur 1 gagne":
+                stopAppelStatut();
+
+                if(numJoueur == 1){
+                  playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
+                  alert("Félicitations, vous avez remporté la partie !!!");
+                  
+                }else{
+                  playerDiv.textContent = "Dommage, vous avez perdu...";
+                  alert("Dommage, vous avez perdu...");
+                }
+                break;
+
+              case "joueur 2 gagne":
+                stopAppelStatut();
+                if(numJoueur == 2){
+                  playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
+                  alert("Félicitations, vous avez remporté la partie !!!");
+                  
+                }else{
+                  playerDiv.textContent = "Dommage, vous avez perdu...";
+                  alert("Dommage, vous avez perdu...");
+                  
+                }
+                break;
+
+              case "Match nul":
+                stopAppelStatut();
+                tourDiv.textContent = "Bien défendu ! Match Nul";
+                alert("Vous vous êtes bien défendu : Match Nul");
+                
+                break;
 
               default:
                 // faire quelque chose si l'état n'est pas reconnu
-                console.log("Erreur état non reconnu ou non traité : " + data.etat);
+                console.log("Etat non traité, inconnu "+data.etat);
                 break;
             }
 
@@ -657,17 +691,20 @@
               win = true;
               recupererCarte(data.carte);
               stopAppelStatut();
+              playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
               alert("Félicitations, vous avez remporté la partie !!!");
               break;
             case "joueur 2 gagne":
               win = true;
               recupererCarte(data.carte);
               stopAppelStatut();
+              playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
               alert("Félicitations, vous avez remporté la partie !!!");
               break;
             case "Match nul":
               recupererCarte(data.carte);
               stopAppelStatut();
+              tourDiv.textContent = "Bien défendu ! Match Nul";
               alert("Vous vous êtes bien défendu : Match Nul");
               break;
             default:
@@ -689,6 +726,9 @@
             // Réinitialisation des infos de jeu
 
             tourDiv.textContent = "Tour du joueur : Rouge";
+            tourDiv.style.backgroundColor = "red";
+
+            playerDiv.textContent = "";
 
 
             // Modification des boutons affichés (suppression du bouton start et affichage des boutons nouvelle partie et abandon)
@@ -755,9 +795,13 @@
                   case "joueur 1 gagne":
                     stopAppelStatut();
                     if(numJoueur == 1){
+                      playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
                       alert("Félicitations, vous avez remporté la partie !!!");
+                      
                     }else{
+                      playerDiv.textContent = "Dommage, vous avez perdu...";
                       alert("Dommage, vous avez perdu...");
+                      
                     }
                     break;
 
@@ -765,14 +809,19 @@
                     stopAppelStatut();
                     if(numJoueur == 2){
                       alert("Félicitations, vous avez remporté la partie !!!");
+                      playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
                     }else{
+                      playerDiv.textContent = "Dommage, vous avez perdu...";
                       alert("Dommage, vous avez perdu...");
+                      
                     }
                     break;
 
                   case "Match nul":
                     stopAppelStatut();
+                    tourDiv.textContent = "Bien défendu ! Match Nul";
                     alert("Vous vous êtes bien défendu : Match Nul");
+
                     break;
           
 
@@ -803,6 +852,7 @@
         currentPlayer = "red";
 
         tourDiv.textContent = "Tour du joueur : Rouge";
+        tourDiv.style.backgroundColor = "red";
         playerDiv.textContent = "Partie terminée";
 
         startBtn.hidden=false;
@@ -815,7 +865,7 @@
         fetch(urlAbandon)
           .then(response => response.json())
           .then(data => {
-            alert(data.etat);
+            alert("Abandon");
           })
           .catch(error => {
             console.error(error);
@@ -832,6 +882,7 @@
         currentPlayer = "red";
 
         tourDiv.textContent = "Tour du joueur : Rouge";
+        tourDiv.style.backgroundColor = "red";
         versusDiv.textContent = "";
         playerDiv.textContent = "Votre couleur : ";
       }
@@ -897,25 +948,34 @@
                 // Initialisation des infos de jeu
                 if(numJoueur == 1){
                   numJoueur = 1;
-                  versusDiv.textContent = `${pseudo} VS ${adversaire}`;
-                  playerDiv.textContent = "Votre couleur : Rouge"; 
-                }else{
+                  versusDiv.innerHTML = `<span style="color: red">${pseudo}</span> <span style="color: black; font-weight: bold;">VS</span> <span style="color: yellow">${adversaire}</span>`;
+                  playerDiv.textContent = "Défendez votre couleur !";
+                  playerDiv.style.color = "red";
+                } else {
                   numJoueur = 2;
-                  versusDiv.textContent = `${pseudo} VS ${adversaire}`;
-                playerDiv.textContent = "Votre couleur : Jaune"; 
+                  versusDiv.innerHTML = `<span style="color: yellow">${adversaire}</span> <span style="color: black; font-weight: bold;">VS</span> <span style="color: red">${pseudo}</span>`;
+                  playerDiv.textContent = "Défendez votre couleur !";
+                  playerDiv.style.color = "yellow";
                 }
+
                 if(tour == 1){
                   tourDiv.textContent = "Tour du joueur : Rouge";
-                }else{
+                  tourDiv.style.backgroundColor = "red";
+                } else {
                   tourDiv.textContent = "Tour du joueur : Jaune";
-                }   
+                  tourDiv.style.backgroundColor = "yellow";
+                }
+   
                 break;
             case "joueur 1 gagne":
               stopAppelStatut();
 
               if(numJoueur == 1){
+                playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
                 alert("Félicitations, vous avez remporté la partie !!!");
+                
               }else{
+                playerDiv.textContent = "Dommage, vous avez perdu...";
                 alert("Dommage, vous avez perdu...");
               }
               break;
@@ -923,15 +983,21 @@
             case "joueur 2 gagne":
               stopAppelStatut();
               if(numJoueur == 2){
+                playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
                 alert("Félicitations, vous avez remporté la partie !!!");
+                
               }else{
+                playerDiv.textContent = "Dommage, vous avez perdu...";
                 alert("Dommage, vous avez perdu...");
+                
               }
               break;
 
             case "Match nul":
               stopAppelStatut();
+              playerDiv.textContent = "Bien défendu ! Match Nul";
               alert("Vous vous êtes bien défendu : Match Nul");
+              
               break;
 
             default:
