@@ -15,8 +15,23 @@
   <style>
 
 body {
-        background-color: rgb(175, 175, 175);
-      }
+	background: linear-gradient(-45deg, #8f8f8f, #97afff, #fff68f, #f4a2a2);
+	background-size: 400% 400%;
+	animation: gradient 15s ease infinite;
+	height: 100vh;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
 
   </style>
 </head>

@@ -144,8 +144,24 @@
         margin: 20px;
       }
       body {
-        background-color: rgb(175, 175, 175);
-      }
+	background: linear-gradient(-45deg, #8f8f8f, #97afff, #fff68f, #f4a2a2);
+	background-size: 400% 400%;
+	animation: gradient 15s ease infinite;
+	height: 100vh;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
       header {
          height: 150px;
          padding: 40px;
@@ -602,7 +618,7 @@
 
                 if(numJoueur == 1){
                   playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
-                  alert("Félicitations, vous avez remporté la partie !!!");
+                  // alert("Félicitations, vous avez remporté la partie !!!");
                   
                 }else{
                   playerDiv.textContent = "Dommage, vous avez perdu...";
@@ -614,7 +630,7 @@
                 stopAppelStatut();
                 if(numJoueur == 2){
                   playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
-                  alert("Félicitations, vous avez remporté la partie !!!");
+                  // alert("Félicitations, vous avez remporté la partie !!!");
                   
                 }else{
                   playerDiv.textContent = "Dommage, vous avez perdu...";
@@ -692,14 +708,14 @@
               recupererCarte(data.carte);
               stopAppelStatut();
               playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
-              alert("Félicitations, vous avez remporté la partie !!!");
+              // alert("Félicitations, vous avez remporté la partie !!!");
               break;
             case "joueur 2 gagne":
               win = true;
               recupererCarte(data.carte);
               stopAppelStatut();
               playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
-              alert("Félicitations, vous avez remporté la partie !!!");
+              // alert("Félicitations, vous avez remporté la partie !!!");
               break;
             case "Match nul":
               recupererCarte(data.carte);
@@ -796,7 +812,7 @@
                     stopAppelStatut();
                     if(numJoueur == 1){
                       playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
-                      alert("Félicitations, vous avez remporté la partie !!!");
+                      // alert("Félicitations, vous avez remporté la partie !!!");
                       
                     }else{
                       playerDiv.textContent = "Dommage, vous avez perdu...";
@@ -808,7 +824,7 @@
                   case "joueur 2 gagne":
                     stopAppelStatut();
                     if(numJoueur == 2){
-                      alert("Félicitations, vous avez remporté la partie !!!");
+                      // alert("Félicitations, vous avez remporté la partie !!!");
                       playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
                     }else{
                       playerDiv.textContent = "Dommage, vous avez perdu...";
@@ -956,7 +972,7 @@
                   playerDiv.style.color = "red";
                 } else {
                   numJoueur = 2;
-                  versusDiv.innerHTML = `<span style="color: yellow">${adversaire}</span> <span style="color: black; font-weight: bold;">VS</span> <span style="color: red">${pseudo}</span>`;
+                  versusDiv.innerHTML = `<span style="color: yellow">${pseudo}</span> <span style="color: black; font-weight: bold;">VS</span> <span style="color: red">${adversaire}</span>`;
                   playerDiv.textContent = "Défendez votre couleur !";
                   playerDiv.style.color = "yellow";
                 }
@@ -975,7 +991,7 @@
 
               if(numJoueur == 1){
                 playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
-                alert("Félicitations, vous avez remporté la partie !!!");
+                // alert("Félicitations, vous avez remporté la partie !!!");
                 
               }else{
                 playerDiv.textContent = "Dommage, vous avez perdu...";
@@ -987,7 +1003,7 @@
               stopAppelStatut();
               if(numJoueur == 2){
                 playerDiv.textContent = "Fécilications ! Vous avez remporté la partie !!!";
-                alert("Félicitations, vous avez remporté la partie !!!");
+                // alert("Félicitations, vous avez remporté la partie !!!");
                 
               }else{
                 playerDiv.textContent = "Dommage, vous avez perdu...";
